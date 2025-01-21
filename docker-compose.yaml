@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: django
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    networks:
+      - backend
+
+  users:
+    build:
+      context: ./  # Root of the project, where manage.py exists
+    container_name: users_app
+    volumes:
+      - ./users:/app/users  # Volume for users app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=django
+      - DB_USER=user
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+    networks:
+      - backend
+    ports:
+      - "8001:8000"
+
+  tasks:
+    build:
+      context: ./  # Root of the project, where manage.py exists
+    container_name: tasks_app
+    volumes:
+      - ./tasks:/app/tasks  # Volume for tasks app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=django
+      - DB_USER=user
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+    networks:
+      - backend
+    ports:
+      - "8002:8000"
+
+  comments:
+    build:
+      context: ./  # Root of the project, where manage.py exists
+    container_name: comments_app
+    volumes:
+      - ./comments:/app/comments  # Volume for comments app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=django
+      - DB_USER=user
+      - DB_PASSWORD=password
+    depends_on:
+      - db
+    networks:
+      - backend
+    ports:
+      - "8003:8000"
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
